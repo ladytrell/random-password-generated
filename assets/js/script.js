@@ -8,6 +8,8 @@ Function:   Validate responses, prompt again if needed
 Function: 
 */
 
+var min = 0;
+
 var validateLength = function () {
   // convert input to integet
   return ;
@@ -48,9 +50,8 @@ var promptPasswordDetails = function() {
 
 var collectPasswordOptions = function (prompts, passwordDetails) {
   // track selected type to confirm at lease one type selected  
-  var typeCount = 0;
+  var typeCount = 0;  
   
-  //debugger;
   // Display prompts
   for (var i = 0; i < prompts.length; i++) {
      var input;
@@ -92,6 +93,29 @@ var collectPasswordOptions = function (prompts, passwordDetails) {
   return passwordDetails;
 };
 
+// generate random number from 0 to 9
+var selectDigit = function (max) {
+  return (Math.floor(Math.random() * (max - min) + min));
+};
+
+// select random alphabet
+var selectLetter = function (upperCase) {
+  var lowerCaseLet = 'abcdefghijklmnopqrstuvwxyz';
+  var position = selectDigit(lowerCaseLet.length);
+  var newLetter = lowerCaseLet.charAt(position);
+  if (upperCase) {
+    newLetter = newLetter.toUpperCase();
+  }
+  return newLetter;
+};
+
+var selectSpecial = function () {
+  var specialLet = " !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\" ?";
+  var position = selectDigit(specialLet.length);  
+  
+  return specialLet.charAt(position);
+}
+
 var generatePassword = function() {
   // Object for user selected criteria
   var passwordDetails = {
@@ -101,16 +125,33 @@ var generatePassword = function() {
     "number": false,
     "special": false
   }
-  console.log(passwordDetails);
-  //Use passwordCritia and random fuctions to select characters for passwod
-  //Validate generated password meets critia
-    //Adjust password if needed to meet critia
+
+  var password = '';
 
   var promptContent = promptPasswordDetails();
   collectPasswordOptions(promptContent, passwordDetails); 
   console.log(passwordDetails);
   
-  return 0;
+  //Use passwordCritia and random fuctions to select characters for passwod
+  //Validate generated password meets critia
+    //Adjust password if needed to meet critia
+
+  var newCharacter = '';
+  for (var i = 0; i < passwordDetails.length; i++) {
+    newCharacter = selectDigit(passwordDetails.length);
+    password = password + newCharacter;
+    
+    newCharacter = selectLetter(passwordDetails.upperCase);
+    password = password + newCharacter;
+    //debugger;
+    newCharacter =  selectSpecial();
+    password = password + newCharacter;
+
+    console.log(password);
+    
+  }
+
+  return password;
 };
 
 // Get references to the #generate element
@@ -126,6 +167,6 @@ function writePassword() {
 };
 
 // Add event listener to generate button
-// generateBtn.addEventListener("click", writePassword);
+generateBtn.addEventListener("click", writePassword);
 
-generatePassword();
+//generatePassword();
