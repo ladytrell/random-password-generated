@@ -8,17 +8,15 @@ Function:   Validate responses, prompt again if needed
 Function: 
 */
 
-var min = 0;
-
-var validateLength = function () {
+var validateLength = function (passwordLength) {
   // convert input to integet
-  return ;
-};
 
-// Assignment code here
-var valdateDetails = function (pwdDetails, count) {
+  if( 8 <= passwordLength  && passwordLength <= 128){
+    return true;
+  }
 
-  // validated and at least one character type should be selected
+  alert("Please a valid password length.");
+  return false;
 };
 
 var promptPasswordDetails = function() {
@@ -44,7 +42,7 @@ var promptPasswordDetails = function() {
     'promptTxt': "Include special characters \" !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\" ?",
     'queryType': "CONFIRM"}  
   ];
-  console.log(prompts);
+  
   return prompts;
 };
 
@@ -54,20 +52,20 @@ var collectPasswordOptions = function (prompts, passwordDetails) {
   
   // Display prompts
   for (var i = 0; i < prompts.length; i++) {
-     var input;
-     if (prompts[i].queryType === "CONFIRM"){
-      input = window.confirm(prompts[i].promptTxt);
-      if(input) {
-        typeCount++;
+      var input;
+      if (prompts[i].queryType === "CONFIRM"){
+        input = window.confirm(prompts[i].promptTxt);
+        if(input) {
+          typeCount++;
+        }
+      } else{
+        // Loop until valid content is entered
+        do {
+          input = parseInt(window.prompt(prompts[i].promptTxt)); 
+        } while (!validateLength(input));
+
       }
-     } else{
-       // Loop until valid content is entered
-      //do {
-        input = window.prompt(prompts[i].promptTxt); 
-      //} while (!validateLength(input));
-
-     }
-
+  
      //Switch to set passwordDetails
      switch(prompts[i].value) {
       case "length":                       
@@ -88,30 +86,43 @@ var collectPasswordOptions = function (prompts, passwordDetails) {
       default:
         break;
     }
-  }
+
+    //Repeat loop if no character option was selected
+    if (i == prompts.length - 1 && !typeCount){
+      i = -1;
+      alert("Select at least one character option");
+    }
+  } //End of For loop
   
   return passwordDetails;
 };
 
 // generate random number from 0 to 9
-var selectDigit = function (max) {
+var selectDigit = function (min, max) {
   return (Math.floor(Math.random() * (max - min) + min));
 };
 
 // select random alphabet
-var selectLetter = function (upperCase) {
+var selectLetter = function (upperCase, lowerCase) {
   var lowerCaseLet = 'abcdefghijklmnopqrstuvwxyz';
-  var position = selectDigit(lowerCaseLet.length);
+  var position = selectDigit(0, lowerCaseLet.length);
   var newLetter = lowerCaseLet.charAt(position);
   if (upperCase) {
-    newLetter = newLetter.toUpperCase();
+    if(selectDigit(0, 2)) {
+      newLetter = newLetter.toUpperCase();
+    }
   }
+  if(!lowerCase) {
+    newLetter = newLetter.toLowerCase();
+  }
+
   return newLetter;
 };
 
+// Select special characters
 var selectSpecial = function () {
   var specialLet = " !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\" ?";
-  var position = selectDigit(specialLet.length);  
+  var position = selectDigit(0, specialLet.length);  
   
   return specialLet.charAt(position);
 }
@@ -137,18 +148,23 @@ var generatePassword = function() {
     //Adjust password if needed to meet critia
 
   var newCharacter = '';
-  for (var i = 0; i < passwordDetails.length; i++) {
-    newCharacter = selectDigit(passwordDetails.length);
-    password = password + newCharacter;
+  
+  while (password.length < passwordDetails.length) {  
+     
+    switch (selectDigit(0, 3)) {
+      case 0:
+        if(passwordDetails.number) { newCharacter = selectDigit(0, passwordDetails.length); }
+        break;
+      case 1:
+        if(passwordDetails.upperCase || passwordDetails.lowerCase) {
+          newCharacter = selectLetter(passwordDetails.upperCase, passwordDetails.lowerCase);
+        }
+        break;
+      case 2:
+        if(passwordDetails.special) { newCharacter =  selectSpecial(); }
+    }
     
-    newCharacter = selectLetter(passwordDetails.upperCase);
     password = password + newCharacter;
-    //debugger;
-    newCharacter =  selectSpecial();
-    password = password + newCharacter;
-
-    console.log(password);
-    
   }
 
   return password;
@@ -163,10 +179,7 @@ function writePassword() {
   var passwordText = document.querySelector("#password");
 
   passwordText.value = password;
-
 };
 
 // Add event listener to generate button
 generateBtn.addEventListener("click", writePassword);
-
-//generatePassword();
