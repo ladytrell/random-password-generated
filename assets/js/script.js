@@ -19,11 +19,9 @@ var validateLength = function (passwordLength) {
   return false;
 };
 
+//Set strings for prompts
 var promptPasswordDetails = function() {
-  //Prompted for the length of the password at least 8 characters and no more than 128 characters
-  //Prompt for character types use confirm whether or not to include lowercase, uppercase, numeric, 
-    // and/or special characters
-
+  
   //Array of prompts per password criteria
   var prompts = [
     {'value': "length",
